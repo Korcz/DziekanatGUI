@@ -26,7 +26,8 @@ import korczal.jakub.modele.CustomJListModel;
 import korczal.jakub.modele.CustomTableModel;
 
 public class PanelTabela extends JPanel implements ActionListener{
-	JTable table;
+	private JTable table;
+	private CustomTableModel tableModel;
 	
 	private JButton btnDelete;
 	private JButton btnFiltr;
@@ -116,7 +117,7 @@ public class PanelTabela extends JPanel implements ActionListener{
 			cboxRokTo.updateUI();
 		});
 		
-		CustomTableModel tableModel = new CustomTableModel(
+		tableModel = new CustomTableModel(
 				BazaDanych.innerJoin(),
 				Arrays.asList(new String[]{"Id", "Imie", "Nazwisko", "Wiek ", "Rok Sudiow", 
 						"Name", "Place", "Dean's name", "Establish Year"})
@@ -228,10 +229,10 @@ public class PanelTabela extends JPanel implements ActionListener{
 		System.out.println(Arrays.toString(rokStudiowTab));
 		System.out.println(Arrays.toString(wiekTab));
 		
-		BazaDanych.pobierzDaneFiltrowanie(imiona, nazwiska, nazwy, rokStudiowTab, wiekTab, 
+		tableModel.updateRows(BazaDanych.pobierzDaneFiltrowanie(imiona, nazwiska, nazwy, rokStudiowTab, wiekTab, 
 				cbImie.isSelected(), cbNazwisko.isSelected(), cbNazwaUczelni.isSelected(), 
-				cbRokStudiow.isSelected(), cbWiek.isSelected());
-		
+				cbRokStudiow.isSelected(), cbWiek.isSelected()));
+		table.updateUI();
 	
 		
 	}

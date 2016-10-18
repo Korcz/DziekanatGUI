@@ -54,10 +54,10 @@ public class Main
 		List<Integer> lista = BazaDanych.selectRokStudiow();
 		
 		
-		for (Integer s : lista)
+	/*	for (Integer s : lista)
 		{
 			System.out.println(s);
-		}
+		}*/
 		
 		/*BazaDanych.insertLogin("a", "a", "ADMIN");
 		BazaDanych.insertLogin("b", "b", "ADMIN");

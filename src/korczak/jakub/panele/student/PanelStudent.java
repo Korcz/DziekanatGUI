@@ -47,6 +47,8 @@ public class PanelStudent extends JPanel implements ActionListener
 	int idx = 0;
 
 	private PanelInsertStudent panelInsertStudent;
+	
+	
 
 	public PanelStudent()
 	{

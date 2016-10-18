@@ -1212,27 +1212,35 @@ public class BazaDanych
 		} 
 	}
 	
-	public static  void pobierzDaneFiltrowanie(List<String> imiona, List<String> nazwiska, 
+	public static List<Laczona> pobierzDaneFiltrowanie(List<String> imiona, List<String> nazwiska, 
 			List<String> nazwy, int[] rokStudiowTab, int[] wiekTab, boolean imionaState, 
 			boolean nazwiskaState, boolean nazwyState, boolean rokStudiowState, boolean wiekState)
 	{
 		String nazwiskaStr = "";
-		if (nazwy != null && !nazwy.isEmpty())
+		if (nazwiska != null && !nazwiska.isEmpty())
 		{
-			nazwiskaStr = "Student.nazwisko in ( " + String.join(",", nazwy) + " )";
+			nazwiskaStr = " Student.nazwisko in ( " + String.join(",", nazwiska) + " )";
 		}
 		
 		
 		String imionaStr = "";
 		if (imiona != null && !imiona.isEmpty())
 		{
-			imionaStr = "Student.imie in ( " + String.join(",", imiona) + " )";
+			//zamiast join robisz foreach i w kazdym obiegu bierzesz kolejny element i opatrujesz go apostrofami
+			//a potem dodajesz do imionaStr
+			//imionaStr = " Student.imie in ( " + String.join(",", imiona) + " )";
+			
+			for (String s : imiona)
+			{
+				s = "'" + s + "'";
+				imionaStr += s;
+			}
 		}
 		
 		String nazwyStr = "";
 		if (nazwy != null && !nazwy.isEmpty())
 		{
-			nazwyStr = "Uczelnia.nazwa in ( " +  String.join(",", nazwy) + " )";
+			nazwyStr = " Uczelnia.nazwa in ( " +  String.join(",", nazwy) + " )";
 		}
 		
 		String rokStudiowStr = "";
@@ -1254,40 +1262,99 @@ public class BazaDanych
 				+ "Student inner join Wpis "
 				+ "on Student.id = Wpis.idStudent "
 				+ "inner join "
-				+ "Uczelnia on Wpis.idUczelnia = Uczelnia.id where ";
+				+ "Uczelnia on Wpis.idUczelnia = Uczelnia.id";
 		
-		if (imionaState == true)
+		if 
+		(
+				(!imionaState && !nazwiskaState && !nazwyState && !wiekState && !rokStudiowState) ||
+				((imionaState && imiona.isEmpty()) && (nazwiskaState && nazwiska.isEmpty()) && 
+				(nazwyState && nazwy.isEmpty()) && !wiekState && !rokStudiowState )
+		)
 		{
-			sql += imionaStr;
-			sql += " ";	
+			sql += ";";
 		}
-		
-		
-		if (nazwiskaState)
+		else
 		{
+			sql += " WHERE ";
 			if (imionaState == true)
 			{
-				sql += " AND ";
+				sql += imionaStr;
+				sql += " ";	
 			}
 			
-			sql += nazwiskaStr;
-			sql += " ";
-		}
-		
-		if (nazwyState == true)
-		{
-			if (imionaState || nazwiskaState)
+			
+			if (nazwiskaState)
 			{
-				sql += " AND ";
+				if (imionaState == true && !nazwiska.isEmpty())
+				{
+					sql += " AND ";
+				}
+				
+				sql += nazwiskaStr;
+				sql += " ";
 			}
 			
-			sql += nazwyStr;
-			sql += " ";
+			if (nazwyState == true)
+			{
+				if ((imionaState || nazwiskaState) && !nazwy.isEmpty())
+				{
+					sql += " AND ";
+				}
+				
+				sql += nazwyStr;
+				sql += " ";
+			}
+			
+			if (wiekState == true)
+			{
+				if ((imionaState || nazwiskaState || nazwyState))
+				{
+					sql += " AND ";
+				}
+				
+				sql += wiekStr;
+				sql += " ";
+			}
+			
+			if (rokStudiowState == true)
+			{
+				if ((imionaState || nazwiskaState || nazwyState || wiekState))
+				{
+					sql += " AND ";
+				}
+				
+				sql += rokStudiowStr;
+				sql += " ";
+			}
+			
+			sql += ";";
+			
 		}
-		
-		sql += ";";
 		
 		System.out.println(sql);
+		try {
+			List<Laczona> laczona = new ArrayList<>();
+			ResultSet rs = stat.executeQuery(sql);
+			while(rs.next())
+			{
+				int id = rs.getInt(1);
+				String imie = rs.getString(2);
+				String nazwisko = rs.getString(3);
+				int wiek = rs.getInt(4);
+				int rokStudiow = rs.getInt(5);
+				String name = rs.getString(6);
+				String place = rs.getString(7);
+				int establishYear = rs.getInt(8);
+				String deansName = rs.getString(9);	
+				laczona.add(new Laczona(id, imie, nazwisko, wiek, rokStudiow, name, place, establishYear, deansName));
+			}
+			return laczona;
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
+		
 	}
 
 
